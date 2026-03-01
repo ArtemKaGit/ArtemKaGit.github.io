@@ -4,15 +4,11 @@
     <meta charset="utf-8">
     <title>Угадай число — игра на Python</title>
     
-    <!-- ЭТО УБИРАЕТ ПРОСТЫНЮ ТЕКСТА ВНИЗУ -->
-    <meta name="pyscript" content="display-errors=false">
-    
-    <!-- Подключаем PyScript для запуска Python в браузере -->
+    <!-- Подключаем PyScript -->
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
     
     <style>
-        /* Стили для красивого оформления */
         body {
             font-family: Arial, sans-serif;
             max-width: 600px;
@@ -37,12 +33,15 @@
             background: #e8f5e9;
             border-radius: 5px;
             font-size: 18px;
-            white-space: pre-wrap;
         }
         .comment {
             color: #4a4a4a;
             font-style: italic;
             margin: 10px 0;
+        }
+        /* Скрываем блок с Python-кодом */
+        .py-script-hidden {
+            display: none;
         }
     </style>
 </head>
@@ -50,78 +49,47 @@
     <div class="game-box">
         <h1>🎮 Угадай число</h1>
         
-        <!-- Элементы интерфейса -->
         <input type="number" id="guess-input" placeholder="Введи число от 1 до 100">
         <button id="guess-btn" py-click="check_guess()">Проверить</button>
         
-        <!-- Сюда будет выводиться результат игры -->
         <div id="output"></div>
-        
-        <!-- Подсказка для игрока -->
-        <div class="comment">💡 Введи число и нажми кнопку — компьютер подскажет, больше оно или меньше</div>
+        <div class="comment">💡 Введи число и нажми кнопку</div>
     </div>
 
-    <!-- Код на Python с твоими комментариями -->
-<py-script config='{"print": false}'>
-# Импортируем библиотеку random для генерации случайного числа.
+    <!-- Весь Python-код теперь в скрытом теге -->
+    <script type="py" hidden>
+from pyscript import Element
 import random
-from pyscript import Element  # Нужно для работы с кнопками и полями ввода
 
-# Приветствуем игрока, обозначаем правила игры.
 print("🎮 Добро пожаловать в игру 'Угадай число'!")
 
-# Переменная для хранения случайного целого числа от 1 до 100.
 number = random.randint(1, 100)
-
-# Переменная для хранения ответа пользователя. Присваиваем ей значение 0 (точно не совпадает с загаданным числом).
 guess = 0
-
-# Переменная для хранения количества попыток. В начале игры игрок сделал 0 попыток.
 attempts = 0
 
-# Выводим сообщение в специальное поле на странице (чтобы игрок видел подсказки)
 output_element = Element("output")
 output_element.write("Я загадал число от 1 до 100. Попробуй угадать!")
 
-
-# Функция, которая будет вызываться при каждом нажатии кнопки
 def check_guess():
-    global attempts, guess, number, output_element  # Говорим Python, что мы используем переменные из основной программы
-    
-    # Получаем значение из поля ввода
+    global attempts, guess, number
     input_element = Element("guess-input")
     
     try:
-        # Просим игрока ввести число.
-        # Полученное число сохраняем в переменную guess.
         guess = int(input_element.value)
+        attempts += 1
         
-        # Увеличиваем счетчик попыток на 1.
-        attempts = attempts + 1
-        
-        # Проверяем, что число в диапазоне 1-100
         if guess < 1 or guess > 100:
             output_element.write("⚠️ Число должно быть от 1 до 100! Попробуй ещё раз.")
-        # Если ответ guess меньше, чем загаданное число number
         elif guess < number:
-            # Выводим сообщение, что число слишком маленькое
             output_element.write(f"🔽 Загаданное число БОЛЬШЕ! (попытка {attempts})")
-        # Иначе, если guess больше, чем number
         elif guess > number:
-            # Выводим сообщение, что число слишком большое
             output_element.write(f"🔼 Загаданное число МЕНЬШЕ! (попытка {attempts})")
-        # Иначе (то есть если число НЕ меньше и НЕ больше, значит, оно равно)
         else:
-            # Поздравляем игрока с победой!
             output_element.write(f"🎉 ПОБЕДА! Ты угадал число {number} за {attempts} попыток!")
-    
     except ValueError:
-        # Если игрок ввёл не число (буквы или символы)
         output_element.write("❌ Ошибка! Введи именно число, а не буквы.")
     
-    # Очищаем поле ввода для следующей попытки
     input_element.clear()
-    </py-script>
+    </script>
 </body>
 </html>
-
