@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Угадай число</title>
+    <title>Угадай число — история ответов</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,6 +28,22 @@
             background: #e8f5e9;
             border-radius: 5px;
             font-size: 18px;
+            min-height: 60px;
+        }
+        #history {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            font-size: 14px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .history-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #555;
         }
     </style>
 </head>
@@ -35,20 +51,33 @@
     <div class="game-box">
         <h1>🎮 Угадай число</h1>
         <p>Компьютер загадал число от 1 до 100.</p>
+        
         <input type="number" id="guessInput" placeholder="Введи число">
         <button onclick="checkGuess()">Проверить</button>
+        
+        <!-- Текущий ответ -->
         <div id="output">Попробуй угадать!</div>
+        
+        <!-- Блок истории -->
+        <div id="history-container" style="display: none;">
+            <div class="history-title">📋 История твоих ответов:</div>
+            <div id="history"></div>
+        </div>
     </div>
 
     <script>
         let number = Math.floor(Math.random() * 100) + 1;
         let attempts = 0;
+        let historyList = [];  // Массив для хранения истории
 
         function checkGuess() {
             const input = document.getElementById('guessInput');
             const output = document.getElementById('output');
+            const historyDiv = document.getElementById('history');
+            const historyContainer = document.getElementById('history-container');
             const guess = parseInt(input.value);
 
+            // Проверка на число
             if (isNaN(guess)) {
                 output.innerText = '❌ Введи число!';
                 return;
@@ -56,16 +85,51 @@
 
             attempts++;
 
+            // Создаем запись для истории
+            let historyEntry = `Попытка ${attempts}: число ${guess} — `;
+            let currentMessage = '';
+
+            // Основная логика
             if (guess < 1 || guess > 100) {
-                output.innerText = '⚠️ Число должно быть от 1 до 100!';
+                currentMessage = '⚠️ Число должно быть от 1 до 100!';
+                historyEntry += '❌ вне диапазона';
             } else if (guess < number) {
-                output.innerText = `🔽 Загаданное число БОЛЬШЕ! (попытка ${attempts})`;
+                currentMessage = `🔽 Загаданное число БОЛЬШЕ! (попытка ${attempts})`;
+                historyEntry += '🔽 слишком маленькое';
             } else if (guess > number) {
-                output.innerText = `🔼 Загаданное число МЕНЬШЕ! (попытка ${attempts})`;
+                currentMessage = `🔼 Загаданное число МЕНЬШЕ! (попытка ${attempts})`;
+                historyEntry += '🔼 слишком большое';
             } else {
-                output.innerText = `🎉 ПОБЕДА! Число ${number}, попыток: ${attempts}`;
+                currentMessage = `🎉 ПОБЕДА! Число ${number}, попыток: ${attempts}`;
+                historyEntry += `🎉 УГАДАЛ! (число ${number})`;
+                
+                // Добавляем победную запись в историю
+                historyList.push(historyEntry);
+                
+                // Показываем историю
+                historyContainer.style.display = 'block';
+                historyDiv.innerHTML = historyList.map(item => `• ${item}`).join('<br>');
+                
+                // Выводим сообщение
+                output.innerText = currentMessage;
+                
+                // Блокируем ввод после победы (по желанию)
+                // input.disabled = true;
+                
+                return;
             }
 
+            // Добавляем запись в историю
+            historyList.push(historyEntry);
+            
+            // Показываем историю
+            historyContainer.style.display = 'block';
+            historyDiv.innerHTML = historyList.map(item => `• ${item}`).join('<br>');
+            
+            // Выводим текущее сообщение
+            output.innerText = currentMessage;
+            
+            // Очищаем поле
             input.value = '';
             input.focus();
         }
