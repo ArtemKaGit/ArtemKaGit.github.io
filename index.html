@@ -2,11 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Угадай число — игра на Python</title>
-    
-    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
-    
+    <title>Угадай число</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,44 +34,41 @@
 <body>
     <div class="game-box">
         <h1>🎮 Угадай число</h1>
-        
-        <input type="number" id="guess-input" placeholder="Введи число от 1 до 100">
-        <button id="guess-btn" py-click="check_guess()">Проверить</button>
-        
-        <div id="output">Я загадал число от 1 до 100. Попробуй угадать!</div>
+        <p>Компьютер загадал число от 1 до 100.</p>
+        <input type="number" id="guessInput" placeholder="Введи число">
+        <button onclick="checkGuess()">Проверить</button>
+        <div id="output">Попробуй угадать!</div>
     </div>
 
-    <py-script>
-from pyscript import Element
-import random
+    <script>
+        let number = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
 
-number = random.randint(1, 100)
-attempts = 0
+        function checkGuess() {
+            const input = document.getElementById('guessInput');
+            const output = document.getElementById('output');
+            const guess = parseInt(input.value);
 
-def check_guess(*args):
-    global attempts
-    input_elem = Element("guess-input")
-    output_elem = Element("output")
-    
-    try:
-        guess = int(input_elem.value)
-        attempts += 1
-        
-        if guess < 1 or guess > 100:
-            output_elem.write("⚠️ Число должно быть от 1 до 100!")
-        elif guess < number:
-            output_elem.write(f"🔽 Загаданное число БОЛЬШЕ! (попытка {attempts})")
-        elif guess > number:
-            output_elem.write(f"🔼 Загаданное число МЕНЬШЕ! (попытка {attempts})")
-        else:
-            output_elem.write(f"🎉 ПОБЕДА! Число {number}, попыток: {attempts}")
-            # Сброс для новой игры (если хочешь)
-            # number = random.randint(1, 100)
-            # attempts = 0
-    except:
-        output_elem.write("❌ Ошибка! Введи число.")
-    
-    input_elem.clear()
-    </py-script>
+            if (isNaN(guess)) {
+                output.innerText = '❌ Введи число!';
+                return;
+            }
+
+            attempts++;
+
+            if (guess < 1 || guess > 100) {
+                output.innerText = '⚠️ Число должно быть от 1 до 100!';
+            } else if (guess < number) {
+                output.innerText = `🔽 Загаданное число БОЛЬШЕ! (попытка ${attempts})`;
+            } else if (guess > number) {
+                output.innerText = `🔼 Загаданное число МЕНЬШЕ! (попытка ${attempts})`;
+            } else {
+                output.innerText = `🎉 ПОБЕДА! Число ${number}, попыток: ${attempts}`;
+            }
+
+            input.value = '';
+            input.focus();
+        }
+    </script>
 </body>
 </html>
